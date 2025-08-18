@@ -27,7 +27,7 @@
                 <a href="#about" class="hover:text-yellow-300 transition">À propos</a>
                 <a href="#services" class="hover:text-yellow-300 transition">Services</a>
                 <a href="#events" class="hover:text-yellow-300 transition">Événements</a>
-                <a href="#contact" class="hover:text-yellow-300 transition">Contact</a>
+                {{--  <a href="#contact" class="hover:text-yellow-300 transition">Contact</a> --}}
                 {{-- Pour la gestion des rôles pour un admin --}}
                 <!-- Lien vers la gestion des rôles, visible uniquement pour les admins -->
                 @auth
@@ -41,22 +41,29 @@
                 @endauth
                 {{-- Gestion des cotisations --}}
                 @auth
-
-                    @if(auth()->user()->can('manage_tresorier'))
-                        <a href="{{ route('cotisations.index') }}"
-                        class="hover:text-yellow-300 transition">
-                        Gestion des cotisations
-                        </a>
+                    {{--  @dd(auth()->user()->isTresorier())--}}
+                    {{-- Trésorier --}}
+                    @if(auth()->user()->isTresorier() || auth()->user()->isAdmin())
+                        <a href="{{ route('cotisations.index') }}">Gestion des cotisations</a>
                     @endif
+                @endauth
+
+                {{-- mes cotisations  --}}
+                @auth
+                    <a href="{{ route('cotisations.mescotisations') }}" class="hover:text-yellow-300 transition">
+                        Mes Cotisations
+                    </a>
                 @endauth
                 {{-- Profil ou connexion/déconnexion --}}
                 @auth
                     <div class="flex flex-col items-center">
-                        <img
-                            src="{{ Auth::user()->profile_photo_url ?? asset('images/default-avatar.png') }}"
-                            alt="Avatar"
-                            class="w-10 h-10 rounded-full object-cover"
-                        >
+                        <a href="{{ route('profile.edit') }}">
+                            <img
+                                src="{{ Auth::user()->profile_photo_url ?? asset('images/default-avatar.png') }}"
+                                alt="Avatar"
+                                class="w-10 h-10 rounded-full object-cover hover:opacity-80 transition"
+                            >
+                        </a>
                         <form method="POST" action="{{ route('logout') }}" class="mt-1">
                             @csrf
                             <button

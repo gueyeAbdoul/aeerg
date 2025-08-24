@@ -5,6 +5,9 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CotisationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\EmpruntController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +92,37 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 });
+
+Route::middleware(['auth'])->group(function () {
+
+    // ✅ Tous les utilisateurs connectés peuvent voir la liste des ressources
+    Route::get('gestion/ressources', [DocumentController::class, 'index'])
+        ->name('gestion.ressources');
+
+    // ✅ Tous les utilisateurs connectés peuvent voir les emprunts
+    Route::get('emprunts', [EmpruntController::class, 'index'])
+        ->name('emprunts.index');
+
+    // 🔒 Gestion des documents (seulement Admin + Responsable pédagogique)
+    Route::middleware(['role:Admin,Responsable pédagogique'])->group(function () {
+        Route::resource('documents', DocumentController::class)->except(['index', 'show']);
+        Route::resource('emprunts', EmpruntController::class)->except(['index']);
+    });
+
+    // ✅ Les autres (Membre, Trésorier) peuvent seulement créer un emprunt
+    Route::post('admin/emprunts', [EmpruntController::class, 'store'])
+        ->name('emprunts.store')
+        ->middleware('role:Admin,Responsable pédagogique,Membre,Trésorier');
+});
+
+Route::resource('documents', DocumentController::class)->middleware('checkRole:Admin,Responsable pédagogique');
+
+Route::middleware('auth')->group(function () {
+    Route::get('mesemprunts', [EmpruntController::class, 'mesEmprunts'])
+        ->name('emprunts.mesemprunts');
+});
+Route::post('emprunts', [EmpruntController::class, 'store'])->name('emprunts.store')->middleware('auth');
+
 
 // ⚠️ Breeze gère déjà l’auth → pas besoin de Auth::routes()
 require __DIR__.'/auth.php';

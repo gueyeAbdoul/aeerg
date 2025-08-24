@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEERG - Association des Élèves et Étudiants de Gouye Reine</title>
+    <title>AEERG</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -35,7 +35,7 @@
                     @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.users.index') }}"
                         class="hover:text-yellow-300 transition">
-                            Gestion des rôles
+                            Gestion des membres
                         </a>
                     @endif
                 @endauth
@@ -54,6 +54,23 @@
                         Mes Cotisations
                     </a>
                 @endauth
+
+                {{-- Gestion des documents (Admin + Responsable pédagogique) --}}
+                @auth
+                    @if(auth()->user()->isAdmin() || auth()->user()->isResponsablePedagogique())
+                        <a href="{{ route('documents.index') }}" class="hover:text-yellow-300 transition">
+                            Gestion des documents
+                        </a>
+                    @endif
+                @endauth
+
+                {{-- Mes emprunts (tous les utilisateurs connectés) --}}
+                @auth
+                    <a href="{{ route('emprunts.mesemprunts') }}" class="hover:text-yellow-300 transition">
+                        Mes emprunts
+                    </a>
+                @endauth
+
                 {{-- Profil ou connexion/déconnexion --}}
                 @auth
                     <div class="flex flex-col items-center">
@@ -251,7 +268,7 @@
             <div class="grid md:grid-cols-4 gap-8">
                 <div>
                     <h3 class="text-xl font-bold mb-4">AEERG</h3>
-                    <p>Promouvoir l'excellence académique depuis 2010</p>
+                    <p>Promouvoir l'excellence académique depuis 2015</p>
                 </div>
                 <div>
                     <h4 class="font-bold mb-4">Liens rapides</h4>
@@ -275,7 +292,7 @@
                         <a href="#" class="text-2xl hover:text-yellow-300 transition"><i class="fab fa-facebook"></i></a>
                         <a href="#" class="text-2xl hover:text-yellow-300 transition"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="text-2xl hover:text-yellow-300 transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-2xl hover:text-yellow-300 transition"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.linkedin.com/in/abdoul-gueye-b39750228" class="text-2xl hover:text-yellow-300 transition"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>

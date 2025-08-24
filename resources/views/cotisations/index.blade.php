@@ -75,6 +75,13 @@
                     <p class="text-gray-500 text-center py-4">Aucune cotisation disponible.</p>
                 @endforelse
             </div>
+
+            <!-- Footer avec bouton Retour -->
+            <footer class="mt-auto py-4 bg-gray-100 text-center">
+                <a href="{{ route('home') }}" class="inline-block bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 transition">
+                    ← Retour à l'accueil
+                </a>
+            </footer>
         </div>
     </div>
 </x-app-layout>

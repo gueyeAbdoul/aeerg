@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="container mx-auto py-10 flex justify-center">
         <div class="w-4/5">
-            <h1 class="text-2xl font-semibold mb-6 text-center">Mon Historique de Cotisations</h1>
+            <h1 class="text-2xl font-semibold mb-6 text-center">Historique de mes cotisations</h1>
 
             @php
                 // Filtrer les cotisations de l'utilisateur connecté
@@ -60,6 +60,12 @@
                 <p class="text-gray-500 text-center py-4">Aucune cotisation enregistrée.</p>
             @endforelse
 
+            <!-- Footer avec bouton Retour -->
+            <footer class="mt-auto py-4 bg-gray-100 text-center">
+                <a href="{{ route('home') }}" class="inline-block bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 transition">
+                    ← Retour à l'accueil
+                </a>
+            </footer>
         </div>
     </div>
 </x-app-layout>

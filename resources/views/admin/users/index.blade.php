@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="container mx-auto py-10 flex justify-center">
         <div class="w-4/5">
-            <h1 class="text-3xl font-bold mb-6">Gestion des utilisateurs</h1>
+            <h1 class="text-3xl text-center font-bold mb-6">Gestion des utilisateurs</h1>
 
             @if(session('success'))
                 <div class="bg-green-200 text-green-800 p-3 rounded mb-4">

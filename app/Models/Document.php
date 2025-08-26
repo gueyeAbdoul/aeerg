@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Document extends Model
 {
-    protected $fillable = ['titre', 'chemin_fichier', 'proprietaire_id', 'is_disponible', 'date_ajout'];
+    protected $fillable = ['titre', 'categorie', 'chemin_fichier', 'proprietaire_id', 'is_disponible', 'date_ajout'];
 
     public function proprietaire(): BelongsTo
     {

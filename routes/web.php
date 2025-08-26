@@ -8,7 +8,6 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmpruntController;
 
-
 /*
 |--------------------------------------------------------------------------
 | Routes Web
@@ -36,6 +35,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Formulaire de modification pour le membre connecté
+    Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
+    Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 });
 
 /*
@@ -47,7 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // 🛡️ Admin : gestion des rôles et des utilisateurs
 Route::middleware(['auth', 'checkRole:Admin'])->group(function () {
     Route::get('/admin', function () {
-        return view('admin.dashboard'); // crée une vue admin/dashboard.blade.php
+        return view('admin.dashboard');
     })->name('admin.dashboard');
 
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
@@ -55,74 +58,82 @@ Route::middleware(['auth', 'checkRole:Admin'])->group(function () {
 });
 
 // 💰 Trésorier
-// 💰 Routes pour Trésorier et Admin
 Route::middleware(['auth', 'checkRole:Trésorier'])->group(function () {
-
     // Toutes les actions sur les cotisations
     Route::resource('cotisations', CotisationController::class);
 
-    // Dashboard spécifique Trésorier (accessible aussi à l'Admin grâce à la hiérarchie)
+    // Dashboard spécifique Trésorier
     Route::get('/tresorier', function () {
         return view('tresorier.dashboard');
     })->name('tresorier.dashboard');
 });
 
-// Route pour accéder à ses propres cotisations
-Route::middleware(['auth'])->group(function () {
-    Route::get('/mes-cotisations', [CotisationController::class, 'mesCotisations'])
-        ->name('cotisations.mescotisations');
-});
-
 // 📚 Responsable pédagogique
 Route::middleware(['auth', 'checkRole:Responsable pédagogique'])->group(function () {
     Route::get('/resp-pedagogique', function () {
-        return view('resp.dashboard'); // crée une vue resp/dashboard.blade.php
+        return view('resp.dashboard');
     })->name('resp.dashboard');
 });
 
 // 👥 Membre simple
 Route::middleware(['auth', 'checkRole:Membre'])->group(function () {
     Route::get('/membre', function () {
-        return view('membre.dashboard'); // crée une vue membre/dashboard.blade.php
+        return view('membre.dashboard');
     })->name('membre.dashboard');
 });
 
-// Formulaire de modification pour le membre connecté
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
-    Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
-});
+/*
+|--------------------------------------------------------------------------
+| Routes pour les ressources et emprunts
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware(['auth'])->group(function () {
+// Route publique pour lire un document
+Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
 
+// Routes authentifiées pour la gestion des ressources et emprunts
+Route::middleware(['auth'])->group(function () {
     // ✅ Tous les utilisateurs connectés peuvent voir la liste des ressources
     Route::get('gestion/ressources', [DocumentController::class, 'index'])
         ->name('gestion.ressources');
+
+    // ✅ Route documents.index pour tous les utilisateurs authentifiés
+    Route::get('documents', [DocumentController::class, 'index'])
+        ->name('documents.index');
 
     // ✅ Tous les utilisateurs connectés peuvent voir les emprunts
     Route::get('emprunts', [EmpruntController::class, 'index'])
         ->name('emprunts.index');
 
-    // 🔒 Gestion des documents (seulement Admin + Responsable pédagogique)
-    Route::middleware(['role:Admin,Responsable pédagogique'])->group(function () {
-        Route::resource('documents', DocumentController::class)->except(['index', 'show']);
-        Route::resource('emprunts', EmpruntController::class)->except(['index']);
-    });
+    // ✅ Mes cotisations
+    Route::get('/mes-cotisations', [CotisationController::class, 'mesCotisations'])
+        ->name('cotisations.mescotisations');
 
-    // ✅ Les autres (Membre, Trésorier) peuvent seulement créer un emprunt
-    Route::post('admin/emprunts', [EmpruntController::class, 'store'])
-        ->name('emprunts.store')
-        ->middleware('role:Admin,Responsable pédagogique,Membre,Trésorier');
-});
-
-Route::resource('documents', DocumentController::class)->middleware('checkRole:Admin,Responsable pédagogique');
-
-Route::middleware('auth')->group(function () {
+    // ✅ Mes emprunts
     Route::get('mesemprunts', [EmpruntController::class, 'mesEmprunts'])
         ->name('emprunts.mesemprunts');
+
+    // ✅ Créer un emprunt (tous les rôles authentifiés)
+    Route::post('emprunts', [EmpruntController::class, 'store'])
+        ->name('emprunts.store');
+
+    // 🔒 Gestion des documents (seulement Admin + Responsable pédagogique)
+    Route::middleware(['checkRole:Admin,Responsable pédagogique'])->group(function () {
+        // Routes de gestion complète des documents (sauf index et show qui sont déjà définis)
+        Route::get('documents/create', [DocumentController::class, 'create'])->name('documents.create');
+        Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
+        Route::get('documents/{document}/edit', [DocumentController::class, 'edit'])->name('documents.edit');
+        Route::put('documents/{document}', [DocumentController::class, 'update'])->name('documents.update');
+        Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+        // Routes de gestion des emprunts (sauf index et store qui sont déjà définis)
+        Route::get('emprunts/create', [EmpruntController::class, 'create'])->name('emprunts.create');
+        Route::get('emprunts/{emprunt}', [EmpruntController::class, 'show'])->name('emprunts.show');
+        Route::get('emprunts/{emprunt}/edit', [EmpruntController::class, 'edit'])->name('emprunts.edit');
+        Route::put('emprunts/{emprunt}', [EmpruntController::class, 'update'])->name('emprunts.update');
+        Route::delete('emprunts/{emprunt}', [EmpruntController::class, 'destroy'])->name('emprunts.destroy');
+    });
 });
-Route::post('emprunts', [EmpruntController::class, 'store'])->name('emprunts.store')->middleware('auth');
 
-
-// ⚠️ Breeze gère déjà l’auth → pas besoin de Auth::routes()
+// ⚠️ Breeze gère déjà l'auth
 require __DIR__.'/auth.php';

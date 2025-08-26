@@ -8,10 +8,23 @@ use Illuminate\Support\Facades\Auth;
 
 class DocumentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $documents = Document::with('proprietaire')->get();
+        $query = Document::query();
+
+        if ($request->filled('categorie')) {
+            $query->where('categorie', $request->categorie);
+        }
+
+        $documents = $query->with('proprietaire')->get();
+        // dd($documents);
+        // $documents = Document::with('proprietaire')->get();
         return view('admin.documents.index', compact('documents'));
+    }
+
+    public function show(Document $document)
+    {
+        return view('admin.documents.show', compact('document'));
     }
 
     public function create()
@@ -33,6 +46,7 @@ class DocumentController extends Controller
 
         Document::create([
             'titre' => $request->titre,
+            'categorie' => $request->categorie,
             'chemin_fichier' => $path,
             'proprietaire_id' => Auth::id(),
             'date_ajout' => now(),
@@ -54,10 +68,11 @@ class DocumentController extends Controller
 
         $request->validate([
             'titre' => 'required|string|max:255',
+            'categorie' => 'required|string|max:255',
             'is_disponible' => 'required|boolean',
         ]);
 
-        $document->update($request->only('titre', 'is_disponible'));
+        $document->update($request->only('titre','categorie', 'is_disponible'));
 
         return redirect()->route('gestion.ressources')->with('success', 'Document mis à jour.');
     }

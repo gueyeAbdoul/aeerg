@@ -13,6 +13,16 @@
                 </div>
 
                 <div>
+                    <label class="block">Catégorie</label>
+                    <select name="categorie" class="border p-2 w-full" required>
+                        <option value="Procès-verbal" {{ $document->categorie == 'Procès-verbal' ? 'selected' : '' }}>Procès-verbal</option>
+                        <option value="Rapport" {{ $document->categorie == 'Rapport' ? 'selected' : '' }}>Rapport</option>
+                        <option value="Statuts" {{ $document->categorie == 'Statuts' ? 'selected' : '' }}>Statuts</option>
+                        <option value="Autre" {{ $document->categorie == 'Autre' ? 'selected' : '' }}>Autre</option>
+                    </select>
+                </div>
+
+                <div>
                     <label class="block">Disponibilité</label>
                     <select name="is_disponible" class="border p-2 w-full">
                         <option value="1" {{ $document->is_disponible ? 'selected' : '' }}>Disponible</option>

@@ -7,6 +7,7 @@ use App\Http\Controllers\CotisationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmpruntController;
+use App\Http\Controllers\EvenementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +135,37 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('emprunts/{emprunt}', [EmpruntController::class, 'destroy'])->name('emprunts.destroy');
     });
 });
+
+// Routes pour les événements
+Route::middleware(['auth'])->group(function () {
+
+    // Création uniquement pour Admin + Responsable pédagogique
+    Route::middleware(['checkRole:Admin,Responsable pédagogique'])->group(function () {
+        Route::get('/evenements/create', [EvenementController::class, 'create'])->name('evenements.create');
+        Route::post('/evenements', [EvenementController::class, 'store'])->name('evenements.store');
+    });
+
+    Route::middleware(['auth', 'checkRole:Admin,Responsable pédagogique'])->group(function () {
+        Route::get('/evenements/{evenement}/edit', [EvenementController::class, 'edit'])->name('evenements.edit');
+        Route::put('/evenements/{evenement}', [EvenementController::class, 'update'])->name('evenements.update');
+        Route::delete('/evenements/{evenement}', [EvenementController::class, 'destroy'])->name('evenements.destroy');
+    });
+
+    // Consultation
+    Route::get('/evenements', [EvenementController::class, 'index'])->name('evenements.index');
+    Route::get('/evenements/{evenement}', [EvenementController::class, 'show'])->name('evenements.show');
+
+    // Inscription / Désinscription
+    Route::post('/evenements/{evenement}/inscrire', [EvenementController::class, 'inscrire'])->name('evenements.inscrire');
+    Route::delete('/evenements/{evenement}/desinscrire', [EvenementController::class, 'desinscrire'])->name('evenements.desinscrire');
+});
+
+// API JSON pour FullCalendar
+Route::get('/evenements/json', [App\Http\Controllers\EvenementController::class, 'json'])
+    ->middleware('auth')
+    ->name('evenements.json');
+
+
 
 // ⚠️ Breeze gère déjà l'auth
 require __DIR__.'/auth.php';

@@ -55,20 +55,21 @@
 
                 @auth
                     {{--  @if(auth()->user()->isAdmin() || auth()->user()->isResponsablePedagogique()) --}}
-                        <a href="{{ route('documents.index') }}" class="block hover:text-yellow-300 transition">
-                            Espace documentaire
-                        </a>
-                @auth
+                    <a href="{{ route('documents.index') }}" class="block hover:text-yellow-300 transition">
+                        Espace documentaire
+                    </a>
+
                     <a href="{{ route('emprunts.mesemprunts') }}" class="block hover:text-yellow-300 transition">
                         Mes emprunts
                     </a>
-                @endauth
-                        <a href="{{ route('documents.index') }}" class="block hover:text-yellow-300 transition">
-                            Gestion des événements
-                        </a>
-                        <a href="{{ route('documents.index') }}" class="block hover:text-yellow-300 transition">
-                            Messagerie interne
-                        </a>
+
+                    <a href="{{ route('evenements.index') }}" class="block hover:text-yellow-300 transition">
+                        Gestion des événements
+                    </a>
+
+                    <a href="{{ route('documents.index') }}" class="block hover:text-yellow-300 transition">
+                        Messagerie interne
+                    </a>
                     {{-- @endif  --}}
                 @endauth
 
